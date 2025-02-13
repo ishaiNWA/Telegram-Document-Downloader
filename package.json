@@ -1,0 +1,21 @@
+{
+  "name": "telegramdocumentdownloader",
+  "version": "1.0.0",
+  "description": "App for downloading documents from user's Telegram chat to a file system directory.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "test": "test"
+  },
+  "author": "Ishai Zilberman",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "fs": "^0.0.1-security",
+    "nodemon": "^3.1.9",
+    "path": "^0.12.7",
+    "prompts": "^2.4.2",
+    "telegram": "^2.26.16",
+    "winston": "^3.17.0"
+  }
+}
