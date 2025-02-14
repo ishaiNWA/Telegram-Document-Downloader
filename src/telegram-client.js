@@ -185,12 +185,55 @@ const telegramErrorHandler = (func, funcName) => {
 
 /*****************************************************************************/
 
-const getFileName = (mediaObj) => {
-  if (mediaObj.document && mediaObj.document.attributes) {
-    return mediaObj.document.attributes[0].fileName;
-  }
-  return null;
-};
+const getFileName = (() => {
+  let counter = 1;
+
+  const getCount = () => {
+    let currCount = counter;
+    counter++;
+    return currCount;
+  };
+
+  return (mediaObj) => {
+    console.log(`mediaObj ${JSON.stringify(mediaObj)}`);
+
+    const date = new Date();
+    const timestamp = date
+      .toISOString()
+      .replace(/[:.]/g, "-") // Replace colons and dots with dashes
+      .replace("T", "_") // Replace T with underscore
+      .slice(0, -5); // Remove milliseconds and Z
+
+    if (mediaObj.className === "MessageMediaPhoto") {
+      console.log("HEREEEE!!!!!!!!!!!!!!!\n\n");
+      return timestamp + "_" + getCount() + ".jpg";
+    }
+    if (mediaObj.document && mediaObj.document.attributes) {
+      return timestamp + "_" + mediaObj.document.attributes[0].fileName;
+    }
+    return null;
+  };
+})();
+
+/*****************************************************************************/
+// const getFileName = (mediaObj) => {
+//   console.log(`mediaObj ${JSON.stringify(mediaObj)}`);
+
+//   const timestamp = date
+//     .toISOString()
+//     .replace(/[:.]/g, "-") // Replace colons and dots with dashes
+//     .replace("T", "_") // Replace T with underscore
+//     .slice(0, -5); // Remove milliseconds and Z
+
+//   let fileExtention;
+//   if (mediaObj.className === "MessageMediaPhoto") {
+//     return timestamp + "_" + getCount + ".jpg";
+//   }
+//   if (mediaObj.document && mediaObj.document.attributes) {
+//     return timestamp + "_" + mediaObj.document.attributes[0].fileName;
+//   }
+//   return null;
+// };
 
 /*****************************************************************************/
 const downloadFiles = telegramErrorHandler(async () => {
