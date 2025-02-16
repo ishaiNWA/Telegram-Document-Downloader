@@ -80,10 +80,16 @@ const connectWithExistingSession = async () => {
     connectionPromise.finally(() => {
       clearTimeout(timoutId);
     });
-    6;
+
+    if (env.TELEGRAM_USER_PHONE_NUMBER !== sessionPhoneNumber) {
+      throw new Error(
+        `Phone number mismatch: Expected ${env.TELEGRAM_USER_PHONE_NUMBER}, ` +
+          `but session belongs to ${sessionPhoneNumber}`
+      );
+    }
+
     logger.info(
-      "Telegram-client connection was made via an existing session \n",
-      stringSession
+      "Telegram-client connection was made via an existing session \n"
     );
   } catch (error) {
     logger.error(
@@ -116,40 +122,6 @@ const initTelegramClient = async () => {
   configureTelegramClient();
   await connectTelegramClient();
 };
-
-/*****************************************************************************/
-
-// const downloadFiles = async () => {
-//   console.log("Welcome to downloaded Files function!!");
-//   let msg;
-//   try {
-//     msg = await telegramClient.getMessages("me", { limit: 0 });
-//   } catch (error) {
-//     let invalidSessionArray;
-//     invalidSessionArray = env.INVALID_TELEGRAM_SESSION_CODES.filter(
-//       (invalidSessionCode) => {
-//         return error.code === invalidSessionCode;
-//       }
-//     );
-//     if (invalidSessionArray.length > 0) {
-//       logger.error(
-//         `function ${"..."} has failed due to ${
-//           error.code
-//         }.\nMaking attemp to reconnect with a new session`
-//       );
-
-//       shutDown();
-//       setNoValidSession();
-//       initTelegramClient();
-//     } else {
-//       logger.error(`function ${"..."} has failed due to ${error.code}.`);
-//       throw error;
-//     }
-//   }
-
-//   console.log(msg.total);
-//   console.log(msg.message);
-// };
 
 /*****************************************************************************/
 
@@ -214,26 +186,6 @@ const getFileName = (() => {
     return null;
   };
 })();
-
-/*****************************************************************************/
-// const getFileName = (mediaObj) => {
-//   console.log(`mediaObj ${JSON.stringify(mediaObj)}`);
-
-//   const timestamp = date
-//     .toISOString()
-//     .replace(/[:.]/g, "-") // Replace colons and dots with dashes
-//     .replace("T", "_") // Replace T with underscore
-//     .slice(0, -5); // Remove milliseconds and Z
-
-//   let fileExtention;
-//   if (mediaObj.className === "MessageMediaPhoto") {
-//     return timestamp + "_" + getCount + ".jpg";
-//   }
-//   if (mediaObj.document && mediaObj.document.attributes) {
-//     return timestamp + "_" + mediaObj.document.attributes[0].fileName;
-//   }
-//   return null;
-// };
 
 /*****************************************************************************/
 const downloadFiles = telegramErrorHandler(async () => {

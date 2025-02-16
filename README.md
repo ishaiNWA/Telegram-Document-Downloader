@@ -9,6 +9,8 @@ A Node.js application that enables users to automatically download files from Te
 - Automatic document download from recent "Saved Messages" chat
 - Secure authentication using Telegram phone number
 - Persistent session management
+- validate session phone number matches config phone number
+
 - Intelligent file naming system with:
   - Unique identifier (UID)
   - Date stamp
@@ -26,5 +28,3 @@ A Node.js application that enables users to automatically download files from Te
 ## Development Status
 
 This application is in its initial development phase. Documentation, installation instructions, and additional features will be added progressively.
-
-
