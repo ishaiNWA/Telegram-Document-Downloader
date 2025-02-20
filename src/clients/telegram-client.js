@@ -5,12 +5,13 @@ const {
   getTelegramSession,
   setNoValidSession,
   writeDownlodedMediaToFile,
-} = require("./utils/fs-service");
+} = require("../helpers/fs-service");
 const prompts = require("prompts");
 
-const env = require("./config/env-config");
-const logger = require("./config/logger-config");
+const env = require("../common/env");
+const logger = require("../helpers/logger");
 const { TimedOutError } = require("telegram/errors");
+const { isUserAuthorized } = require("telegram/client/users");
 
 /*****************************************************************************/
 
@@ -62,7 +63,6 @@ const connectWithNewSession = async () => {
 const connectWithExistingSession = async () => {
   try {
     console.log("connectWithExistingSession!!!!!!!!");
-    //await telegramClient.connect();
     let timoutId;
     const connectionPromise = telegramClient.connect();
     const connectionTimeout = new Promise((_, reject) => {
@@ -81,6 +81,16 @@ const connectWithExistingSession = async () => {
       clearTimeout(timoutId);
     });
 
+    if (!(await isUserAuthorized(telegramClient))) {
+      throw new Error("Session exists but is not authorized");
+    }
+
+    const currentUser = await telegramClient.getMe();
+    console.log("Current user data:", currentUser); // Debug log
+    console.log("phone num: ", currentUser.phone);
+
+    const sessionPhoneNumber = await telegramClient.getMe().phone;
+    console.log(`sessionPhoneNumber is: ${sessionPhoneNumber}`);
     if (env.TELEGRAM_USER_PHONE_NUMBER !== sessionPhoneNumber) {
       throw new Error(
         `Phone number mismatch: Expected ${env.TELEGRAM_USER_PHONE_NUMBER}, ` +
@@ -96,8 +106,9 @@ const connectWithExistingSession = async () => {
       "Existing session string is invalid. Attempting to establish a new connection with phone verification.",
       error
     );
-    setNoValidSession();
-    await initTelegramClient();
+    return;
+    // setNoValidSession();
+    // await initTelegramClient();
   }
 };
 

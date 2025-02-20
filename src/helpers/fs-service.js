@@ -1,17 +1,14 @@
 const fs = require("fs");
 const path = require("path");
-const logger = require("../config/logger-config");
-const env = require("../config/env-config");
+const logger = require("./logger");
+const env = require("../common/env");
+const SESSION_KEY_PATH = path.join(__dirname, "../", "config/", "session.key");
 
 const outputTelegramSessionToFile = (stringSession) => {
   try {
-    fs.writeFileSync(
-      path.join(__dirname, "../", "config/", "session.key"),
-      stringSession.trim(),
-      {
-        mode: 0o600,
-      }
-    );
+    fs.writeFileSync(SESSION_KEY_PATH, stringSession.trim(), {
+      mode: 0o600,
+    });
     logger.info(
       `String session was outputted to external file ${path.join(
         __dirname,
@@ -29,10 +26,7 @@ const outputTelegramSessionToFile = (stringSession) => {
 const getTelegramSession = () => {
   let stringSession;
   try {
-    stringSession = fs.readFileSync(
-      path.join(__dirname, "../", "config/", "session.key"),
-      "utf8"
-    );
+    stringSession = fs.readFileSync(SESSION_KEY_PATH, "utf8");
   } catch (error) {
     if (error.code === "ENOENT") {
       //if first run and file not exist
@@ -45,13 +39,9 @@ const getTelegramSession = () => {
 };
 const setNoValidSession = () => {
   try {
-    fs.writeFileSync(
-      path.join(__dirname, "../", "config/", "session.key"),
-      env.NO_VALID_SESSION,
-      {
-        mode: 0o600,
-      }
-    );
+    fs.writeFileSync(SESSION_KEY_PATH, env.NO_VALID_SESSION, {
+      mode: 0o600,
+    });
     logger.info(
       `NO_VALID_SESSION state was outputted to external file ${path.join(
         __dirname,
@@ -87,9 +77,16 @@ const writeDownlodedMediaToFile = async (mediaBuffer, fileName) => {
   );
 };
 
+const ensureNoSessionKey = () => {
+  if (fs.existsSync(SESSION_KEY_PATH)) {
+    fs.unlinkSync(SESSION_KEY_PATH);
+  }
+};
+
 module.exports = {
   outputTelegramSessionToFile,
   getTelegramSession,
   setNoValidSession,
   writeDownlodedMediaToFile,
+  ensureNoSessionKey,
 };

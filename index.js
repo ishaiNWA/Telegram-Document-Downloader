@@ -1,5 +1,8 @@
-const logger = require("./src/config/logger-config");
-const { initTelegramClient, downloadFiles } = require("./src/telegram-client");
+const logger = require("./src/helpers/logger");
+const {
+  initTelegramClient,
+  downloadFiles,
+} = require("./src/clients/telegram-client");
 
 const initTelegramDocumentDownloader = async () => {
   await initTelegramClient();

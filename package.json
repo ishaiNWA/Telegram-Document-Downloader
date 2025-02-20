@@ -5,13 +5,16 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/index.js",
-    "test": "test"
+    "test": "test",
+    "new-user": " node scripts/new-user"
   },
   "author": "Ishai Zilberman",
   "license": "ISC",
   "dependencies": {
+    "child_process": "^1.0.2",
     "dotenv": "^16.4.7",
     "fs": "^0.0.1-security",
+    "libphonenumber-js": "^1.11.20",
     "nodemon": "^3.1.9",
     "path": "^0.12.7",
     "prompts": "^2.4.2",
