@@ -36,8 +36,7 @@ const configureTelegramClient = () => {
 
 const connectWithNewSession = async () => {
   await telegramClient.start({
-    phoneNumber: process.env.TELEGRAM_USER_PHONE_NUMBER, // TODO: take TELEGRAM_USER_PHONE_NUMBER from user when running code
-    // and validate coorect format
+    phoneNumber: process.env.TELEGRAM_USER_PHONE_NUMBER,
     phoneCode: async () => {
       const input = await prompts({
         type: "text",
@@ -89,14 +88,17 @@ const connectWithExistingSession = async () => {
     console.log("Current user data:", currentUser); // Debug log
     console.log("phone num: ", currentUser.phone);
 
-    const sessionPhoneNumber = await telegramClient.getMe().phone;
-    console.log(`sessionPhoneNumber is: ${sessionPhoneNumber}`);
-    if (env.TELEGRAM_USER_PHONE_NUMBER !== sessionPhoneNumber) {
-      throw new Error(
-        `Phone number mismatch: Expected ${env.TELEGRAM_USER_PHONE_NUMBER}, ` +
-          `but session belongs to ${sessionPhoneNumber}`
-      );
-    }
+    // TODO :: i think reduntent  now , because from now a new user settings will always cause session deletion.
+    // so i can remove this.
+
+    // const sessionPhoneNumber = await telegramClient.getMe().phone;
+    // console.log(`sessionPhoneNumber is: ${sessionPhoneNumber}`);
+    // if (env.TELEGRAM_USER_PHONE_NUMBER !== sessionPhoneNumber) {
+    //   throw new Error(
+    //     `Phone number mismatch: Expected ${env.TELEGRAM_USER_PHONE_NUMBER}, ` +
+    //       `but session belongs to ${sessionPhoneNumber}`
+    //   );
+    // }
 
     logger.info(
       "Telegram-client connection was made via an existing session \n"
@@ -106,9 +108,9 @@ const connectWithExistingSession = async () => {
       "Existing session string is invalid. Attempting to establish a new connection with phone verification.",
       error
     );
-    return;
-    // setNoValidSession();
-    // await initTelegramClient();
+
+    setNoValidSession();
+    await initTelegramClient();
   }
 };
 
@@ -178,8 +180,6 @@ const getFileName = (() => {
   };
 
   return (mediaObj) => {
-    console.log(`mediaObj ${JSON.stringify(mediaObj)}`);
-
     const date = new Date();
     const timestamp = date
       .toISOString()
@@ -188,7 +188,6 @@ const getFileName = (() => {
       .slice(0, -5); // Remove milliseconds and Z
 
     if (mediaObj.className === "MessageMediaPhoto") {
-      console.log("HEREEEE!!!!!!!!!!!!!!!\n\n");
       return timestamp + "_" + getCount() + ".jpg";
     }
     if (mediaObj.document && mediaObj.document.attributes) {
@@ -200,19 +199,43 @@ const getFileName = (() => {
 
 /*****************************************************************************/
 const downloadFiles = telegramErrorHandler(async () => {
-  console.log("Welcome to downloaded Files function!!");
-  let msg;
-  msg = await telegramClient.getMessages("me", { limit: 1 });
-
-  const mediaObj = msg[0].media;
-  if (mediaObj) {
+  const downloadAndSaveMedia = async (mediaObj) => {
     const mediaBuffer = await telegramClient.downloadMedia(mediaObj, {
       workers: 1,
     });
-
     await writeDownlodedMediaToFile(mediaBuffer, getFileName(mediaObj));
-    await shutDown();
+  };
+
+  let msg;
+  msg = await telegramClient.getMessages("me", { limit: 1 });
+
+  // case many documents in a message
+  if (msg[0].groupedId) {
+    let groupedId = msg[0].groupedId;
+    let groupedMessages = await telegramClient.getMessages("me", {
+      groupedId: groupedId,
+    });
+
+    // Despite specifying groupedId in getMessages(), the API returns messages
+    // that aren't part of the group. Filter to keep only messages that share
+    // the same groupId value
+    let validGroupMessages = groupedMessages.filter(
+      (msg) => msg.groupedId?.value === groupedId.value
+    );
+
+    await Promise.all(
+      validGroupMessages.map(async (msg) => {
+        if (msg.media) {
+          await downloadAndSaveMedia(msg.media);
+        }
+      })
+    );
+  } else if (msg[0].media) {
+    await downloadAndSaveMedia(msg[0].media);
+  } else {
+    logger.info("There are no documents to download from inspected messages.");
   }
+  await shutDown();
 }, "downloadFiles");
 /*****************************************************************************/
 

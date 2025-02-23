@@ -7,6 +7,7 @@ A Node.js application that enables users to automatically download files from Te
 ## Current Features
 
 - Automatic document download from recent "Saved Messages" chat
+  - Support for downloading multiple documents sent as an album/group in a single message
 - Secure authentication using Telegram phone number
 - Persistent session management
 - validate session phone number matches config phone number
