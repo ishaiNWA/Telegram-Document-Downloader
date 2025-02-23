@@ -2,7 +2,7 @@ require("dotenv").config();
 const path = require("path");
 const logger = require("../helpers/logger");
 
-const MANDATORY_ENV_VARS = ["API_ID", "API_HASH", "TELEGRAM_USER_PHONE_NUMBER"];
+const MANDATORY_ENV_VARS = ["API_ID", "API_HASH"];
 
 function validateMandatoryEnvVariables() {
   const missingFields = MANDATORY_ENV_VARS.filter((mandatoryEnv) => {
@@ -21,6 +21,7 @@ function initEnvVariable() {
   env.API_ID = process.env.API_ID;
   env.API_HASH = process.env.API_HASH;
   env.TELEGRAM_USER_PHONE_NUMBER = process.env.TELEGRAM_USER_PHONE_NUMBER;
+  env.DOWNLOADED_MESSAGES_DEPTH = process.env.DOWNLOADED_MESSAGES_DEPTH || 1;
   env.NO_VALID_SESSION = "";
   env.INVALID_TELEGRAM_SESSION_CODES = [
     "AUTH_KEY_UNREGISTERED",

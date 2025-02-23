@@ -36,7 +36,19 @@ const configureTelegramClient = () => {
 
 const connectWithNewSession = async () => {
   await telegramClient.start({
-    phoneNumber: process.env.TELEGRAM_USER_PHONE_NUMBER,
+    phoneNumber:
+      env.TELEGRAM_USER_PHONE_NUMBER ||
+      (async () => {
+        logger.warn(
+          "No phone number found in environment variables, requesting manual input"
+        );
+        const input = await prompts({
+          type: "text",
+          name: "phone",
+          message: "Please enter your Telegram user phone number ",
+        });
+        return input.phone;
+      }),
     phoneCode: async () => {
       const input = await prompts({
         type: "text",
@@ -50,6 +62,7 @@ const connectWithNewSession = async () => {
       throw error;
     },
   });
+
   logger.info(
     "Telegram-client connection was made with a new string session",
     stringSession

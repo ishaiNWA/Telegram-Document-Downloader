@@ -28,6 +28,7 @@ A Node.js application that enables users to automatically download files from Te
   - Adjustable message history depth for downloads
 - Comprehensive function documentation
 - Detailed installation and usage guides
+- Retry mechanism for wrong connection code input
 
 ## Development Status
 
