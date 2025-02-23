@@ -12,6 +12,10 @@ A Node.js application that enables users to automatically download files from Te
 - Persistent session management
 - validate session phone number matches config phone number
 
+- User configuration options:
+
+  - Connect new user/ Customizable phone number setup
+
 - Intelligent file naming system with:
   - Unique identifier (UID)
   - Date stamp
@@ -20,7 +24,6 @@ A Node.js application that enables users to automatically download files from Te
 ## Upcoming Features
 
 - User configuration options:
-  - Customizable phone number setup
   - Configurable download directory path
   - Adjustable message history depth for downloads
 - Comprehensive function documentation
