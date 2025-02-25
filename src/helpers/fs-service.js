@@ -7,6 +7,10 @@ const MESSAGE_DEPTH_CONFIG_PATH = path.join(
   __dirname,
   "../config/message-depth-config"
 );
+const DOWNLOAD_DIR_CONFIG_PATH = path.join(
+  __dirname,
+  "../config/downloading-dir-path"
+);
 
 const outputTelegramSessionToFile = (stringSession) => {
   try {
@@ -92,6 +96,11 @@ const setDepthToConfigFile = (depth) => {
   logger.info(`download depth was set to ${depth}`);
 };
 
+const setDownloadingDirPathToConfigFile = (path) => {
+  fs.writeFileSync(DOWNLOAD_DIR_CONFIG_PATH, path);
+  logger.info(`downloaded files directory was set to ${path}`);
+};
+
 module.exports = {
   outputTelegramSessionToFile,
   getTelegramSession,
@@ -99,4 +108,5 @@ module.exports = {
   writeDownlodedMediaToFile,
   ensureNoSessionKey,
   setDepthToConfigFile,
+  setDownloadingDirPathToConfigFile,
 };

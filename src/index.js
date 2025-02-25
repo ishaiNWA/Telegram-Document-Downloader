@@ -1,5 +1,5 @@
-const logger = require("./src/helpers/logger");
-const telegramClient = require("./src/clients/telegram-client");
+const logger = require("./helpers/logger");
+const telegramClient = require("./clients/telegram-client");
 
 telegramClient
   .initTelegramClient()

@@ -82,3 +82,12 @@ This will connect to the last user session automatically.
   - npm run set-depth all
 
 - If not specified, the default message depth is 1 (only the most recent message).
+
+### Setting the Download Directory
+
+- You can specify where documents will be downloaded by providing an absolute path:
+- npm run set-download-directory /absolute/path
+
+- The program will create a directory named "TDD" at the specified location to store all downloaded files.
+
+- Note: If no directory is configured, a "TDD" folder will be created in the program's root directory by default.

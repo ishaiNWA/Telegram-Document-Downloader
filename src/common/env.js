@@ -9,6 +9,13 @@ const MESSAGE_DEPTH_CONFIG_PATH = path.join(
   "../config/message-depth-config"
 );
 
+const DOWNLOADED_MEDIA_CONFIG_PATH = path.join(
+  __dirname,
+  "../config/downloading-dir-path"
+);
+
+const DEAFULT_DOWNLOADED_MEDIA_DIR_PATH = path.join(__dirname, "../../");
+
 function validateMandatoryEnvVariables() {
   const missingFields = MANDATORY_ENV_VARS.filter((mandatoryEnv) => {
     return !process.env[mandatoryEnv];
@@ -37,8 +44,8 @@ function initEnvVariable() {
     "SESSION_REVOKED",
   ];
   env.PATH_TO_DOWNLOADED_MEDIA_DIR =
-    process.env.PATH_TO_DOWNLOADED_MEDIA_DIR ||
-    path.join(__dirname, "../../Downloaded-Media");
+    fs.readFileSync(DOWNLOADED_MEDIA_CONFIG_PATH, "utf-8") ||
+    DEAFULT_DOWNLOADED_MEDIA_DIR_PATH;
 
   return env;
 }
