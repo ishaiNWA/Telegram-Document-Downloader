@@ -219,37 +219,46 @@ const downloadFiles = telegramErrorHandler(async () => {
     await writeDownlodedMediaToFile(mediaBuffer, getFileName(mediaObj));
   };
 
-  let msg;
-  msg = await telegramClient.getMessages("me", { limit: 1 });
+  const msgArr = await telegramClient.getMessages("me", {
+    limit: env.MESSAGES_DOWNLOAD_DEPTH,
+  });
 
-  // case many documents in a message
-  if (msg[0].groupedId) {
-    let groupedId = msg[0].groupedId;
-    let groupedMessages = await telegramClient.getMessages("me", {
-      groupedId: groupedId,
-    });
+  await Promise.all(
+    msgArr.map(async (msg) => {
+      // case many documents in a message
+      if (msg.groupedId) {
+        let groupedId = msg.groupedId;
+        let groupedMessages = await telegramClient.getMessages("me", {
+          groupedId: groupedId,
+        });
 
-    // Despite specifying groupedId in getMessages(), the API returns messages
-    // that aren't part of the group. Filter to keep only messages that share
-    // the same groupId value
-    let validGroupMessages = groupedMessages.filter(
-      (msg) => msg.groupedId?.value === groupedId.value
-    );
+        // Despite specifying groupedId in getMessages(), the API returns messages
+        // that aren't part of the group. Filter to keep only messages that share
+        // the same groupId value
+        let validGroupMessages = groupedMessages.filter(
+          (groupedMsg) => groupedMsg.groupedId?.value === groupedId.value
+        );
 
-    await Promise.all(
-      validGroupMessages.map(async (msg) => {
-        if (msg.media) {
-          await downloadAndSaveMedia(msg.media);
-        }
-      })
-    );
-  } else if (msg[0].media) {
-    await downloadAndSaveMedia(msg[0].media);
-  } else {
-    logger.info("There are no documents to download from inspected messages.");
-  }
+        await Promise.all(
+          validGroupMessages.map(async (validGroupedMsg) => {
+            if (validGroupedMsg.media) {
+              await downloadAndSaveMedia(validGroupedMsg.media);
+            }
+          })
+        );
+      } else if (msg.media) {
+        await downloadAndSaveMedia(msg.media);
+      } else {
+        logger.info(
+          `There are no documents to download from message num ${msg.id}.`
+        );
+      }
+    })
+  );
+
   await shutDown();
 }, "downloadFiles");
+
 /*****************************************************************************/
 
 const shutDown = async () => {

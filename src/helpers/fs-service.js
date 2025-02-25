@@ -3,6 +3,10 @@ const path = require("path");
 const logger = require("./logger");
 const env = require("../common/env");
 const SESSION_KEY_PATH = path.join(__dirname, "../", "config/", "session.key");
+const MESSAGE_DEPTH_CONFIG_PATH = path.join(
+  __dirname,
+  "../config/message-depth-config"
+);
 
 const outputTelegramSessionToFile = (stringSession) => {
   try {
@@ -83,10 +87,16 @@ const ensureNoSessionKey = () => {
   }
 };
 
+const setDepthToConfigFile = (depth) => {
+  fs.writeFileSync(MESSAGE_DEPTH_CONFIG_PATH, depth);
+  logger.info(`download depth was set to ${depth}`);
+};
+
 module.exports = {
   outputTelegramSessionToFile,
   getTelegramSession,
   setNoValidSession,
   writeDownlodedMediaToFile,
   ensureNoSessionKey,
+  setDepthToConfigFile,
 };

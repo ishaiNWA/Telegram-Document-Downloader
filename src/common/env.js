@@ -1,8 +1,13 @@
 require("dotenv").config();
+const fs = require("fs");
 const path = require("path");
 const logger = require("../helpers/logger");
 
 const MANDATORY_ENV_VARS = ["API_ID", "API_HASH"];
+const MESSAGE_DEPTH_CONFIG_PATH = path.join(
+  __dirname,
+  "../config/message-depth-config"
+);
 
 function validateMandatoryEnvVariables() {
   const missingFields = MANDATORY_ENV_VARS.filter((mandatoryEnv) => {
@@ -21,8 +26,10 @@ function initEnvVariable() {
   env.API_ID = process.env.API_ID;
   env.API_HASH = process.env.API_HASH;
   env.TELEGRAM_USER_PHONE_NUMBER = process.env.TELEGRAM_USER_PHONE_NUMBER;
-  env.DOWNLOADED_MESSAGES_DEPTH = process.env.DOWNLOADED_MESSAGES_DEPTH || 1;
   env.NO_VALID_SESSION = "";
+
+  env.MESSAGES_DOWNLOAD_DEPTH =
+    fs.readFileSync(MESSAGE_DEPTH_CONFIG_PATH, "utf8") || 1;
   env.INVALID_TELEGRAM_SESSION_CODES = [
     "AUTH_KEY_UNREGISTERED",
     "AUTH_KEY_INVALID",
@@ -33,7 +40,6 @@ function initEnvVariable() {
     process.env.PATH_TO_DOWNLOADED_MEDIA_DIR ||
     path.join(__dirname, "../../Downloaded-Media");
 
-  logger.info("env variable has been successfully initiated.");
   return env;
 }
 
