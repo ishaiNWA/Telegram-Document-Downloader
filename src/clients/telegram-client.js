@@ -282,4 +282,4 @@ const shutDown = async () => {
 
 /*****************************************************************************/
 
-module.exports = { initTelegramClient, downloadFiles };
+module.exports = { initTelegramClient, downloadFiles, shutDown };
