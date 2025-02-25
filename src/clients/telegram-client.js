@@ -15,16 +15,14 @@ const { isUserAuthorized } = require("telegram/client/users");
 
 /*****************************************************************************/
 
-let apiId;
-let apiHash;
 let stringSession;
 let telegramClient;
 const CONNECTION_WAITING_TIME = 5000;
 /*****************************************************************************/
 
 const configureTelegramClient = () => {
-  apiId = Number(env.API_ID);
-  apiHash = env.API_HASH;
+  const apiId = Number(env.API_ID);
+  const apiHash = env.API_HASH;
   stringSession = new StringSession(getTelegramSession());
   telegramClient = new TelegramClient(stringSession, apiId, apiHash, {
     connectionRetries: 5,
@@ -98,8 +96,6 @@ const connectWithExistingSession = async () => {
     }
 
     const currentUser = await telegramClient.getMe();
-    console.log("Current user data:", currentUser); // Debug log
-    console.log("phone num: ", currentUser.phone);
 
     // TODO :: i think reduntent  now , because from now a new user settings will always cause session deletion.
     // so i can remove this.
@@ -153,7 +149,7 @@ const initTelegramClient = async () => {
 
 const telegramErrorHandler = (func, funcName) => {
   return async function () {
-    const funcRes = await func().catch((error) => {
+    const funcRes = await func().catch(async (error) => {
       let invalidSessionArray;
       invalidSessionArray = env.INVALID_TELEGRAM_SESSION_CODES.filter(
         (invalidSessionCode) => {
@@ -164,7 +160,7 @@ const telegramErrorHandler = (func, funcName) => {
         logger.error(
           `function ${funcName} has failed due to ${error.code}.\nMaking attemp to reconnect with a new session`
         );
-        shutDown();
+        await shutDown();
         setNoValidSession();
         initTelegramClient();
       } else {
@@ -212,11 +208,13 @@ const getFileName = (() => {
 
 /*****************************************************************************/
 const downloadFiles = telegramErrorHandler(async () => {
+  let downloadCount = 0;
   const downloadAndSaveMedia = async (mediaObj) => {
     const mediaBuffer = await telegramClient.downloadMedia(mediaObj, {
       workers: 1,
     });
     await writeDownlodedMediaToFile(mediaBuffer, getFileName(mediaObj));
+    ++downloadCount;
   };
 
   const msgArr = await telegramClient.getMessages("me", {
@@ -256,24 +254,15 @@ const downloadFiles = telegramErrorHandler(async () => {
     })
   );
 
-  await shutDown();
+  return downloadCount;
 }, "downloadFiles");
 
 /*****************************************************************************/
 
 const shutDown = async () => {
   try {
-    await telegramClient.disconnect();
-
-    logger.info("Telegram Client has disconnected", {
-      "client-session": stringSession,
-    });
-
-    // Using process.exit(0) because Telegram client maintains a background ping promise
-    // that runs every minute to keep the connection alive. Even after disconnect(),
-    // this promise prevents the Node process from naturally terminating.
-    // Exit code 0 indicates successful completion of the program.
-    process.exit(0);
+    telegramClient.destroy();
+    logger.info("Telegram Client has disconnected");
   } catch (error) {
     logger.error("Error while disconnecting the Telegram Client", { error });
     throw error;

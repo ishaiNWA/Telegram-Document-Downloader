@@ -10,6 +10,7 @@ telegramClient
   .then((documentsCount) => {
     logger.info(`${documentsCount} files were successfully downloaded`);
   })
+  .then(() => telegramClient.shutDown())
   .catch((error) => {
     logger.error(error);
     process.exit(1);

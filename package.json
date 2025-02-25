@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "test": "test",
-    "new-user": " node scripts/new-user"
+    "new-user": " node scripts/new-user.js",
+    "set-depth": "node scripts/set-message-download-depth.js"
   },
   "author": "Ishai Zilberman",
   "license": "ISC",
