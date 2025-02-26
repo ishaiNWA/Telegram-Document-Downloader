@@ -17,14 +17,7 @@ const outputTelegramSessionToFile = (stringSession) => {
     fs.writeFileSync(SESSION_KEY_PATH, stringSession.trim(), {
       mode: 0o600,
     });
-    logger.info(
-      `String session was outputted to external file ${path.join(
-        __dirname,
-        "../",
-        "config/",
-        "session.key"
-      )}`
-    );
+    logger.info(`String session was outputted to external file `);
   } catch (error) {
     logger.error("Failed to save Telegram session:", error);
     throw error;
@@ -50,14 +43,7 @@ const setNoValidSession = () => {
     fs.writeFileSync(SESSION_KEY_PATH, env.NO_VALID_SESSION, {
       mode: 0o600,
     });
-    logger.info(
-      `NO_VALID_SESSION state was outputted to external file ${path.join(
-        __dirname,
-        "../",
-        "config/",
-        "session.key"
-      )}`
-    );
+    logger.info(`NO_VALID_SESSION state was outputted to external file`);
   } catch (error) {
     logger.error("Failed to save Telegram session:", error);
     throw error;
@@ -72,7 +58,7 @@ const ensureMediaDirectoryExist = () => {
 
 const writeDownlodedMediaToFile = async (mediaBuffer, fileName) => {
   ensureMediaDirectoryExist();
-  console.log(`path is: \n ${env.PATH_TO_DOWNLOADED_MEDIA_DIR}`);
+
   fs.writeFileSync(
     path.join(env.PATH_TO_DOWNLOADED_MEDIA_DIR, fileName),
     mediaBuffer,
@@ -82,6 +68,9 @@ const writeDownlodedMediaToFile = async (mediaBuffer, fileName) => {
         throw error;
       }
     }
+  );
+  console.log(
+    `File was donwloaded to : \n ${env.PATH_TO_DOWNLOADED_MEDIA_DIR}`
   );
 };
 

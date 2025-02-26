@@ -72,7 +72,6 @@ const connectWithNewSession = async () => {
 
 const connectWithExistingSession = async () => {
   try {
-    console.log("connectWithExistingSession!!!!!!!!");
     let timoutId;
     const connectionPromise = telegramClient.connect();
     const connectionTimeout = new Promise((_, reject) => {
@@ -94,21 +93,6 @@ const connectWithExistingSession = async () => {
     if (!(await isUserAuthorized(telegramClient))) {
       throw new Error("Session exists but is not authorized");
     }
-
-    const currentUser = await telegramClient.getMe();
-
-    // TODO :: i think reduntent  now , because from now a new user settings will always cause session deletion.
-    // so i can remove this.
-
-    // const sessionPhoneNumber = await telegramClient.getMe().phone;
-    // console.log(`sessionPhoneNumber is: ${sessionPhoneNumber}`);
-    // if (env.TELEGRAM_USER_PHONE_NUMBER !== sessionPhoneNumber) {
-    //   throw new Error(
-    //     `Phone number mismatch: Expected ${env.TELEGRAM_USER_PHONE_NUMBER}, ` +
-    //       `but session belongs to ${sessionPhoneNumber}`
-    //   );
-    // }
-
     logger.info(
       "Telegram-client connection was made via an existing session \n"
     );
@@ -126,11 +110,6 @@ const connectWithExistingSession = async () => {
 /*****************************************************************************/
 
 const connectTelegramClient = async () => {
-  console.log(
-    "getTelegramSession() != env.NO_VALID_SESSION? : ",
-    getTelegramSession() != env.NO_VALID_SESSION
-  );
-
   if (getTelegramSession() != env.NO_VALID_SESSION) {
     await connectWithExistingSession();
   } else {
@@ -147,10 +126,23 @@ const initTelegramClient = async () => {
 
 /*****************************************************************************/
 
+/**
+
+ *@desc  Handles Telegram API errors by catching specific session errors and attempting reconnection.
+ * @param {Function} func - The function to wrap with error handling
+ * @param {string} funcName - Name of the function
+ * @returns {Function} A wrapped function that handles Telegram session errors
+ * @throws {Error} Re-throws non-session related errors
+ */
 const telegramErrorHandler = (func, funcName) => {
   return async function () {
     const funcRes = await func().catch(async (error) => {
       let invalidSessionArray;
+
+      /*
+        Even when a Telegram JS session successfully connects, it may not be valid for sending 
+        * messages, requiring specific error handling to detect and recover from invalid sessions.
+      */
       invalidSessionArray = env.INVALID_TELEGRAM_SESSION_CODES.filter(
         (invalidSessionCode) => {
           return error.code === invalidSessionCode;
@@ -158,7 +150,7 @@ const telegramErrorHandler = (func, funcName) => {
       );
       if (invalidSessionArray.length > 0) {
         logger.error(
-          `function ${funcName} has failed due to ${error.code}.\nMaking attemp to reconnect with a new session`
+          `function ${funcName} has failed due to ${error.code}.\nMaking attempt to reconnect with a new session`
         );
         await shutDown();
         setNoValidSession();
@@ -209,6 +201,7 @@ const getFileName = (() => {
 /*****************************************************************************/
 const downloadFiles = telegramErrorHandler(async () => {
   let downloadCount = 0;
+
   const downloadAndSaveMedia = async (mediaObj) => {
     const mediaBuffer = await telegramClient.downloadMedia(mediaObj, {
       workers: 1,
