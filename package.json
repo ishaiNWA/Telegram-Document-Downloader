@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "test": "test",
-    "tdd": "node src/index.js",
+    "download-documents": "node src/index.js",
     "new-user": " node scripts/new-user.js",
     "set-depth": "node scripts/set-message-download-depth.js",
     "set-download-directory": "node scripts/set-downloading-dir"

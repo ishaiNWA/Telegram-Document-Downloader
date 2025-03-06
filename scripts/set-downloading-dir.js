@@ -11,4 +11,4 @@ if (!process.argv[2]) {
 }
 
 const absPath = process.argv[2];
-setDownloadingDirPathToConfigFile(path.join(absPath, "TDD"));
+setDownloadingDirPathToConfigFile(path.join(absPath, "downloaded-media"));
