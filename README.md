@@ -27,7 +27,7 @@ A Node.js application that enables users to automatically download files from Te
 
 - Authenticate with a new phone number (in international format), use:
 
-  - `npm run new-user +12223334455`
+`npm run new-user +12223334455`
 
 - During authentication, Telegram will send a verification code to your device. When prompted by the program, enter this code to complete the authentication process.
 
@@ -38,7 +38,7 @@ A Node.js application that enables users to automatically download files from Te
 
 If a phone number is already set, simply run:
 
-- `npm run download-documents`
+`npm run download-documents`
 
 This will connect to the last user session automatically.
 
@@ -64,7 +64,7 @@ This will connect to the last user session automatically.
 
 - Specify where documents will be downloaded:
 
-- `npm run set-download-directory /absolute/path`
+`npm run set-download-directory /absolute/path`
 
 - The program will create a directory named "downloaded-media" at the specified location to store all downloaded files.
 
